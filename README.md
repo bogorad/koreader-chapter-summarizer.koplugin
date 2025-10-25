@@ -88,7 +88,7 @@ The plugin works with any OpenRouter-supported model. Popular choices:
 
 - **x-ai/grok-4-fast** (default) - Very fast, good quality
 - **google/gemini-2.5-flash-lite**
-- **qwen/qwen3-vl-235b-a22b-thinking**
+- **qwen/qwen3-235b-a22b-thinking-2507**
 
 See [all models](https://openrouter.ai/models) on OpenRouter.
 
@@ -106,7 +106,7 @@ Examples:
 
 - `x-ai/grok-4-fast` (default, fast)
 - `google/gemini-2.5-flash-lite`
-- `qwen/qwen3-vl-235b-a22b-thinking`
+- `qwen/qwen3-235b-a22b-thinking-2507`
 
 ### Prompt
 
