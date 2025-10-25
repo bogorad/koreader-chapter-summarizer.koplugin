@@ -32,7 +32,7 @@ function ChapterSummarizer:init()
   self.model = self.settings:readSetting("model", "x-ai/grok-4-fast")
   self.prompt = self.settings:readSetting(
     "prompt",
-    "Summarize chapter in 3-5 paragraphs. Do not inflate the paragraph count, only grow the number above 3 if necessary."
+    "Summarize chapter in 3-5 paragraphs. Do not inflate the paragraph count, only grow the number above 3 if necessary. Return ONLY plain text without any markdown formatting, bullet points, or special characters."
   )
   self.max_summary_tokens = self.settings:readSetting("max_summary_tokens", 1000)
   self:onDispatcherRegisterActions()
@@ -439,4 +439,3 @@ function ChapterSummarizer:saveSettings()
 end
 
 return ChapterSummarizer
-
