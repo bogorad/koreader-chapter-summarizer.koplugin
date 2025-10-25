@@ -1,0 +1,9 @@
+{
+  "workspace": {
+    "library": ["./koreader/frontend"],
+    "ignoreDir": [".vscode", ".git", "koreader/.git"]
+  },
+  "diagnostics": {
+    "globals": ["G_reader_settings"]
+  }
+}
