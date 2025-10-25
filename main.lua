@@ -116,33 +116,62 @@ end
 function ChapterSummarizer:extractChapterText(chapter_info)
   local doc = self.ui.document
   local text_parts = {}
+
+  UIManager:show(InfoMessage:new({
+    text = _("Extracting chapter text..."),
+  }))
+
+  -- For EPUB and other CRE documents (reflowable formats)
   if doc.info.has_pages == false then
-    local start_pos = doc:getPosFromPageNumber(chapter_info.start_page)
-    local end_pos = doc:getPosFromPageNumber(chapter_info.end_page)
-    if start_pos and end_pos then
+    -- Get XPointers for start and end pages
+    local start_xp = doc:getPageXPointer(chapter_info.start_page)
+    local end_xp = doc:getPageXPointer(chapter_info.end_page)
+
+    if start_xp and end_xp then
       local ok, text = pcall(function()
-        return doc:getTextFromPositions(start_pos, end_pos)
+        return doc:getTextFromXPointers(start_xp, end_xp, false)
       end)
-      if ok and text then
-        return text
+
+      if ok and text and text.text then
+        return text.text
       end
     end
   end
-  local max_pages = math.min(chapter_info.end_page - chapter_info.start_page + 1, 50)
-  for i = 0, max_pages - 1 do
-    local page = chapter_info.start_page + i
-    if page > chapter_info.end_page then
-      break
-    end
+
+  -- Fallback: Extract page by page (works for all formats including PDFs)
+  -- Limit to 50 pages to avoid excessive token usage
+  local max_pages = math.min(chapter_info.end_page, chapter_info.start_page + 50)
+
+  for page = chapter_info.start_page, max_pages do
     local ok, page_text = pcall(function()
-      return doc:getPageText(page)
+      -- For CRE documents, we need to navigate to the page and get text
+      if doc.getPageXPointer then
+        local xp = doc:getPageXPointer(page)
+        if xp then
+          return doc:getTextFromXPointer(xp)
+        end
+      else
+        -- For PDF/DJVU documents
+        return doc:getPageText(page)
+      end
     end)
+
     if ok and page_text then
       table.insert(text_parts, page_text)
     end
   end
+
+  if #text_parts == 0 then
+    return nil
+  end
+
   local full_text = table.concat(text_parts, "\n\n")
-  full_text = full_text:gsub("\r\n", "\n"):gsub("[ \t]+", " "):gsub("\n\n+", "\n\n")
+
+  -- Clean up text
+  full_text = full_text:gsub("\r\n", "\n")
+  full_text = full_text:gsub("[ \t]+", " ")
+  full_text = full_text:gsub("\n\n+", "\n\n")
+
   return full_text
 end
 
